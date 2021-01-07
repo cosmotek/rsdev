@@ -1,0 +1,151 @@
+scalar Time
+scalar Duration
+scalar Upload
+scalar UUID
+scalar Username
+scalar Bio
+scalar EmailAddress
+scalar PhoneNumber
+
+# used to define methods that don't require authentication (such as the authentication and healthcheck methods)
+# directive @skipAuth on QUERY | OBJECT | FIELD_DEFINITION | INPUT_OBJECT | ARGUMENT_DEFINITION
+
+type NotificationPreferences {
+  notificationsEnabled: Boolean!
+}
+
+type User {
+  id: UUID!
+
+  username: Username!
+  bio: Bio!
+  avatarImageUrl: String!
+  pointCount: Int!
+
+  notificationPreferences: NotificationPreferences!
+  lastLoginAt: Time!
+  createdAt: Time!
+
+  # TODO decide how to attach friends
+  # following: [User!]!
+  # followers: [User!]!
+}
+
+type EmailAuthMethod {
+  emailAddress: EmailAddress!
+}
+
+type SMSAuthMethod {
+  phoneNumber: PhoneNumber!
+}
+
+input SMSPincode {
+  phoneNumber: PhoneNumber!
+  pincode: String!
+}
+
+type EmailHash {
+  emailAddress: EmailAddress!
+  authHash: String!
+  randomBits: String!
+}
+
+union AuthMethod = SMSAuthMethod | EmailAuthMethod
+
+type SessionTokenInfo {
+  cookieKey: String!
+  tokenValue: String!
+  expires: Time!
+
+  # indicates if an account was found matching the provided creds. 
+  # If true, identity will NOT be null.
+  accountAssociated: Boolean!
+  identity: UserIdent
+}
+
+type UserIdent {
+  id: UUID!
+  personas: [UUID!]!
+  linkedPhoneNumber: PhoneNumber
+
+  lastLoginAt: Time!
+  createdAt: Time!
+}
+
+input SearchQuery {
+  title: String!
+  yearReleased: String
+  mediaType: MediaType!
+  pageNumber: Int!
+}
+
+type SearchResults {
+	totalElements: Int!
+  totalPages: Int!
+  pageSize: Int!
+  pageNumber: Int!
+	results: [SearchResult!]!
+}
+
+type SearchResult {
+	title: String!
+	year: String!
+	imdbID: String!
+	type: MediaType!
+	posterImageURL: String!
+}
+
+enum MediaType {
+  ANY,
+  SERIES,
+  MOVIE,
+  EPISODE,
+  GAME,
+}
+
+type MediaResult {
+  title: String!
+  year: String!
+  rated: String!
+  released: Time!
+  runtime: Duration!
+  genres: [String!]!
+  director: String!
+  writers: [String!]!
+  actors: [String!]!
+  plot: String!
+  language: String!
+  country: String!
+  awards: String!
+  posterImageURL: String!
+  # ratings: [ContentRating!]!
+  metascore: String!
+  imdbRating: Float!
+  imdbVotes: Int!
+  imdbID: String!
+  typeOf: MediaType!
+  totalSeasons: Int!
+  websiteURL: String!
+  production: String!
+  boxOffice: String!
+  dvd: String!
+}
+
+type Query {
+  searchContent(input: SearchQuery!): SearchResults!
+  getMediaByImdbID(input: String!): MediaResult!
+
+  # if id is null, the logged in user will be provided to all non-service clients.
+  getUser(id: UUID!): User
+  searchUsersByUsername(username: String!): [User!]!
+  checkUsernameAvailable(username: Username!): Boolean!
+}
+
+type Mutation {
+  requestVerificationPincode(input: PhoneNumber!): Boolean!
+  requestSMSSessionToken(input: SMSPincode): SessionTokenInfo!
+  refreshSessionToken(sessionToken: String!, getPersona: Boolean!): SessionTokenInfo!
+  # requestEmailSessionToken(input: EmailHash): SessionTokenInfo! @skipAuthorization
+
+  createUser(username: Username!, bio: Bio): User!
+}
