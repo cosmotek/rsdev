@@ -37,5 +37,5 @@ Copy and paste the following into the GraphQL Playground to make authenticated q
 
 _Please ensure your `$GOBIN` is set and in your `$PATH`._
 ```sh
-go get gitlab.com/therecspot/rsdev
+go get -u gitlab.com/therecspot/rsdev
 ```
