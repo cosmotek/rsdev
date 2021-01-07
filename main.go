@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	pjson "github.com/hokaccha/go-prettyjson"
 	"github.com/machinebox/graphql"
@@ -84,7 +85,7 @@ mutation ($phoneNumber: PhoneNumber!, $pinCode: String!) {
 			req.Var("pinCode", pinCode)
 
 			// run it and capture the response
-			var res2 interface{}
+			var res2 RequestSMSSessionTokenResponse
 			if err := client.Run(ctx, req, &res2); err != nil {
 				fmt.Printf("%s\n", err.Error())
 				return monolog.ExitChain
@@ -97,10 +98,37 @@ mutation ($phoneNumber: PhoneNumber!, $pinCode: String!) {
 			}
 
 			fmt.Println(string(jsonData))
+			fmt.Println("\nCopy and paste the following into the GraphQL Playground to make authenticated queries:")
+
+			jsonData, err = pjson.Marshal(map[string]string{
+				res2.Response.CookieKey: res2.Response.TokenValue,
+			})
+			if err != nil {
+				fmt.Printf("%s\n", err.Error())
+				return monolog.ExitChain
+			}
+
+			fmt.Println(string(jsonData))
 			return monolog.Continue
 		}).Do()
 
 	if err != nil {
 		panic(err)
 	}
+}
+
+type RequestSMSSessionTokenResponse struct {
+	Response struct {
+		AccountAssociated bool      `json:"accountAssociated"`
+		CookieKey         string    `json:"cookieKey"`
+		TokenValue        string    `json:"tokenValue"`
+		Expires           time.Time `json:"expires"`
+		Identity          struct {
+			CreatedAt         time.Time `json:"createdAt"`
+			ID                string    `json:"id"`
+			LastLoginAt       time.Time `json:"lastLoginAt"`
+			LinkedPhoneNumber string    `json:"linkedPhoneNumber"`
+			Personas          []string  `json:"personas"`
+		} `json:"identity"`
+	} `json:"requestSMSSessionToken"`
 }
