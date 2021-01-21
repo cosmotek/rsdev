@@ -7,6 +7,15 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+
+	"github.com/mgutz/ansi"
+	"goji.io"
+	"goji.io/pat"
+)
+
+var (
+	lime  = ansi.ColorCode("green+h")
+	reset = ansi.ColorCode("reset")
 )
 
 func NewHeaderProxy(dst string) (*HeaderProxy, error) {
@@ -34,7 +43,9 @@ func (h *HeaderProxy) Set(key, val string) {
 
 func (h *HeaderProxy) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	for key, val := range h.headers {
-		req.Header.Add(key, val)
+		if key != "" && val != "" {
+			req.Header.Add(key, val)
+		}
 	}
 
 	h.proxy.ServeHTTP(res, req)
@@ -52,9 +63,12 @@ func (proxy *HeaderProxy) StartProxy(ctx context.Context, port *string) error {
 	}
 
 	listenerPort := listener.Addr().(*net.TCPAddr).Port
-	fmt.Printf("starting authentication proxy on http://0.0.0.0:%d\n", listenerPort)
+	fmt.Printf("%sStarting authentication proxy on http://0.0.0.0:%d\n%s", lime, listenerPort, reset)
 
-	err = http.Serve(listener, proxy)
+	mux := goji.NewMux()
+	mux.Handle(pat.New("/*"), proxy)
+
+	err = http.Serve(listener, mux)
 	if err != nil {
 		return err
 	}

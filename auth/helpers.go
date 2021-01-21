@@ -8,7 +8,14 @@ import (
 
 	pjson "github.com/hokaccha/go-prettyjson"
 	"github.com/machinebox/graphql"
+	"github.com/mgutz/ansi"
 	"github.com/rucuriousyet/monolog"
+)
+
+var (
+	lime  = ansi.ColorCode("green+h")
+	cyan  = ansi.ColorCode("cyan+h")
+	reset = ansi.ColorCode("reset")
 )
 
 type AuthHeader struct {
@@ -45,7 +52,7 @@ mutation ($phoneNumber: PhoneNumber!) {
 				return monolog.ExitChain
 			}
 
-			fmt.Println("Pincode sent successfully, please check your phone (pincode may take as much as 10 minutes to arrive).")
+			fmt.Println(lime, "\nPincode sent successfully, please check your phone (pincode may take as much as 10 minutes to arrive).", reset)
 			return monolog.Continue
 		}).
 		Add(func(p *monolog.Prompter) monolog.Cmd {
@@ -88,10 +95,10 @@ mutation ($phoneNumber: PhoneNumber!, $pinCode: String!) {
 				return monolog.ExitChain
 			}
 
-			fmt.Println("\nA new session has been created:")
+			fmt.Println(lime, "\nA new session has been created:", reset)
 			fmt.Println(string(jsonData))
 
-			fmt.Println("\nCopy and paste the following into the GraphQL Playground to make authenticated queries:")
+			fmt.Println(cyan, "\nCopy and paste the following into the GraphQL Playground to make authenticated queries:", reset)
 			jsonData, err = pjson.Marshal(map[string]string{
 				tokRes.Response.CookieKey: tokRes.Response.TokenValue,
 			})
@@ -134,7 +141,19 @@ func RefreshToken(ctx context.Context, graphqlEndpointURL, oldToken string) (Aut
 
 	req := graphql.NewRequest(`
 mutation ($sessionToken: String!) {
-	refreshSessionToken(sessionToken: $sessionToken): SessionTokenInfo!
+	refreshSessionToken(sessionToken: $sessionToken) {
+		cookieKey
+		tokenValue
+		expires
+			accountAssociated
+			identity {
+				id
+				personas
+				linkedPhoneNumber
+				lastLoginAt
+				createdAt
+			}
+	}
 }
 `)
 

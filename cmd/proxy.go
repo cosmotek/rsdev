@@ -8,19 +8,28 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/mgutz/ansi"
 	"github.com/spf13/cobra"
 	"gitlab.com/therecspot/rsdev/auth"
 	"gitlab.com/therecspot/rsdev/net"
 )
 
+var (
+	red   = ansi.ColorCode("red+h")
+	reset = ansi.ColorCode("reset")
+)
+
+var port string
 var Proxy = &cobra.Command{
-	Use:   "proxy",
+	Use:   "proxy [endpoint]",
 	Short: "HTTP Authentication Proxy",
 	Long:  `Automatically handles authentication under the hood allowing you to make requests without ever setting up authorization`,
+	Args:  cobra.ExactValidArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		grapqlEndpoint := args[0]
+		hostEndpoint := args[0]
+		grapqlEndpoint := hostEndpoint + "/query"
 
-		proxy, err := net.NewHeaderProxy(grapqlEndpoint)
+		proxy, err := net.NewHeaderProxy(hostEndpoint)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -61,7 +70,12 @@ var Proxy = &cobra.Command{
 		}()
 
 		go func() {
-			err = proxy.StartProxy(ctx, nil)
+			var err error
+			if port != "" {
+				err = proxy.StartProxy(ctx, &port)
+			} else {
+				err = proxy.StartProxy(ctx, nil)
+			}
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
@@ -74,6 +88,10 @@ var Proxy = &cobra.Command{
 		// block until exit
 		<-exitSignal
 		cancel()
-		fmt.Println("\nProxy stopped...\nGoodbye.")
+		fmt.Println(red, "\nProxy stopped... Goodbye.", reset)
 	},
+}
+
+func init() {
+	Proxy.Flags().StringVarP(&port, "port", "p", "", "sets the proxy listener port")
 }
