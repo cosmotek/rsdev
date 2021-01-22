@@ -64,7 +64,7 @@ var Proxy = &cobra.Command{
 					}
 
 					proxy.Set(headerInfo.HeaderKey, headerInfo.Value)
-					fmt.Println(cyan, "Token refreshed...", reset)
+					fmt.Println(cyan+"Token refreshed...", reset)
 				case <-ctx.Done():
 					break loop
 				}
@@ -90,7 +90,7 @@ var Proxy = &cobra.Command{
 		// block until exit
 		<-exitSignal
 		cancel()
-		fmt.Println(red, "\nProxy stopped... Goodbye.", reset)
+		fmt.Println(red+"\nProxy stopped... Goodbye.", reset)
 	},
 }
 

@@ -52,7 +52,7 @@ mutation ($phoneNumber: PhoneNumber!) {
 				return monolog.ExitChain
 			}
 
-			fmt.Println(lime, "\nPincode sent successfully, please check your phone (pincode may take as much as 10 minutes to arrive).", reset)
+			fmt.Println(lime+"\nPincode sent successfully, please check your phone (pincode may take as much as 10 minutes to arrive).", reset)
 			return monolog.Continue
 		}).
 		Add(func(p *monolog.Prompter) monolog.Cmd {
@@ -95,10 +95,10 @@ mutation ($phoneNumber: PhoneNumber!, $pinCode: String!) {
 				return monolog.ExitChain
 			}
 
-			fmt.Println(lime, "\nA new session has been created:", reset)
+			fmt.Println(lime+"\nA new session has been created:", reset)
 			fmt.Println(string(jsonData))
 
-			fmt.Println(cyan, "\nCopy and paste the following into the GraphQL Playground to make authenticated queries:", reset)
+			fmt.Println(cyan+"\nCopy and paste the following into the GraphQL Playground to make authenticated queries:", reset)
 			jsonData, err = pjson.Marshal(map[string]string{
 				tokRes.Response.CookieKey: tokRes.Response.TokenValue,
 			})
@@ -136,11 +136,27 @@ type RequestSMSSessionTokenResponse struct {
 	} `json:"requestSMSSessionToken"`
 }
 
+type RefreshSessionTokenResponse struct {
+	Response struct {
+		AccountAssociated bool      `json:"accountAssociated"`
+		CookieKey         string    `json:"cookieKey"`
+		TokenValue        string    `json:"tokenValue"`
+		Expires           time.Time `json:"expires"`
+		Identity          struct {
+			CreatedAt         time.Time `json:"createdAt"`
+			ID                string    `json:"id"`
+			LastLoginAt       time.Time `json:"lastLoginAt"`
+			LinkedPhoneNumber string    `json:"linkedPhoneNumber"`
+			Personas          []string  `json:"personas"`
+		} `json:"identity"`
+	} `json:"refreshSessionToken"`
+}
+
 func RefreshToken(ctx context.Context, graphqlEndpointURL, oldToken string) (AuthHeader, error) {
 	client := graphql.NewClient(graphqlEndpointURL)
 
 	req := graphql.NewRequest(`
-mutation ($sessionToken: String!) {
+mutation c($sessionToken: String!) {
 	refreshSessionToken(sessionToken: $sessionToken) {
 		cookieKey
 		tokenValue
@@ -159,7 +175,7 @@ mutation ($sessionToken: String!) {
 
 	req.Var("sessionToken", oldToken)
 
-	var res RequestSMSSessionTokenResponse
+	var res RefreshSessionTokenResponse
 	if err := client.Run(ctx, req, &res); err != nil {
 		return AuthHeader{}, err
 	}
