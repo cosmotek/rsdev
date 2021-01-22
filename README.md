@@ -33,6 +33,13 @@ Copy and paste the following into the GraphQL Playground to make authenticated q
 }
 ```
 
+# Git Config (Required for all private repos)
+Add the following to your global `.gitconfig` file:
+```toml
+[url "git@gitlab.com:"]
+	insteadOf = https://gitlab.com/
+```
+
 ## Installation
 
 _Please ensure your `$GOBIN` is set and in your `$PATH`._
