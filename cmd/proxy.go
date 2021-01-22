@@ -16,6 +16,7 @@ import (
 
 var (
 	red   = ansi.ColorCode("red+h")
+	cyan  = ansi.ColorCode("cyan+h")
 	reset = ansi.ColorCode("reset")
 )
 
@@ -51,21 +52,22 @@ var Proxy = &cobra.Command{
 			for {
 				timeUntil := time.Now().Sub(headerInfo.ExpiresAt)
 				timer := time.NewTimer(timeUntil - (time.Minute * 1))
+				defer timer.Stop()
 
 				// block until timer completes or exit started
 				select {
 				case <-timer.C:
+					headerInfo, err = auth.RefreshToken(ctx, grapqlEndpoint, headerInfo.Value)
+					if err != nil {
+						fmt.Println(err)
+						os.Exit(1)
+					}
+
+					proxy.Set(headerInfo.HeaderKey, headerInfo.Value)
+					fmt.Println(cyan, "Token refreshed...", reset)
 				case <-ctx.Done():
 					break loop
 				}
-
-				headerInfo, err = auth.RefreshToken(ctx, grapqlEndpoint, headerInfo.Value)
-				if err != nil {
-					fmt.Println(err)
-					os.Exit(1)
-				}
-
-				proxy.Set(headerInfo.HeaderKey, headerInfo.Value)
 			}
 		}()
 
