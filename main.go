@@ -9,9 +9,10 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "rsdev",
-	Short: "RecSpot Dev Tool",
-	Long:  `A collection of useful helpers, automated processes and other utilities for developing RecSpot software`,
+	Use:     "rsdev",
+	Version: "v1.0.0",
+	Short:   "RecSpot Dev Tool",
+	Long:    `A collection of useful helpers, automated processes and other utilities for developing RecSpot software`,
 }
 
 func main() {
