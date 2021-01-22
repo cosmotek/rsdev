@@ -50,7 +50,7 @@ var Proxy = &cobra.Command{
 		go func() {
 		loop:
 			for {
-				timeUntil := time.Now().Sub(headerInfo.ExpiresAt)
+				timeUntil := headerInfo.ExpiresAt.Sub(time.Now())
 				timer := time.NewTimer(timeUntil - (time.Minute * 1))
 				defer timer.Stop()
 
