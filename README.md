@@ -1,36 +1,32 @@
 # RecSpot Dev Tool
 
-Right now this tool only has one function, dev login. Here's an example:
+Authentication Proxy Example:
 ```sh
-$ rsdev http://localhost:5000/query
+$ rsdev proxy http://34.218.48.156:5000
 whats your phone number?: 7408772320
-{
-  "requestVerificationPincode": true
-}
-whats the pincode: 3005
+ 
+Pincode sent successfully, please check your phone (pincode may take as much as 10 minutes to arrive). 
+whats the pincode: 8750
+ 
+A new session has been created: 
 {
   "requestSMSSessionToken": {
-    "accountAssociated": true,
+    "accountAssociated": false,
     "cookieKey": "X_RECSPOT_SESSION_TOKEN",
-    "expires": "2021-01-07T20:47:06Z",
+    "expires": "2021-01-22T20:02:16Z",
     "identity": {
-      "createdAt": "2021-01-06T20:59:28Z",
-      "id": "74da7343-6134-4a3d-ad1f-63e930ba21a1",
-      "lastLoginAt": "2021-01-07T20:17:06Z",
-      "linkedPhoneNumber": "7408772320",
-      "personas": [
-        "eea4a2ef-ade4-4528-a49b-43500531ca7f",
-        "cb2f27f5-34ef-4e3f-bedc-f850dc65bb06"
-      ]
+      "createdAt": "2021-01-22T16:50:47Z",
+      "id": "6608e66f-505a-44ef-b68e-dca50cfa8749",
+      "lastLoginAt": "2021-01-22T17:02:16Z",
+      "linkedPhoneNumber": "17408772320",
+      "personas": []
     },
-    "tokenValue": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJtb2JpbGUudGhlcmVjc3BvdC5jb20iLCJleHAiOiIyMDIxLTAxLTA3VDIwOjQ3OjA2LjEyODk3NTE4OVoiLCJpYXQiOiIyMDIxLTAxLTA3VDIwOjE3OjA2LjEyODk3NTA3WiIsImp0aSI6IjU1MmZkYjE2LWE4NmUtNGI3OC05MzMzLTQzYzk0OTFhMGFjNyIsIm5iZiI6IjIwMjEtMDEtMDdUMjA6MTc6MDYuMTI4OTc1MTM0WiIsInJvbGUiOiJ1c2VyIiwic3ViIjoiNzQwODc3MjMyMCIsInN1YmlkIjoiNzRkYTczNDMtNjEzNC00YTNkLWFkMWYtNjNlOTMwYmEyMWExIiwic3VidHlwIjoicGhvbmVfbnVtYmVyIiwidHZlciI6MX0.jNF84zzCjEX_CnfTkCqYMZVC9R72ijjbJjjjcZiFMh7QXjnjhh_mQSQHKQtA6c4hUVDABLTcJaBdoN5mLqkouEia72xyOjbG-3S_hbTM71MlMzTparu_c6M8_E5C7Hppv5GY1SjyOAk05Npo6uBE23q3QOCbcIGG01DqoOLVL0CPQml3R7TRG7IlVbuy9CEOQ0KrfDq4ExCAtmLNp942bnP6ifmBsu_Ymq6NaXWZDlDN3oNAHvtfLCgQvYqL7Xoc1L5ln3WPcV8m76BPuK65bGQhdSWlOd_xUrQQ2eOxC35OGq8G2z-cWl9bZFdA0rIAOpF4eKIbi_IVZBuRG7sylLvkb4r5Kw_DpHVWoVQ47Nce2h8nyik1ye-NiG3i5smnZG3LQ-HAy0QGt62oFiZmRVSnN3G2-ayQi26tuB9V_3j0GhA5ugZuuu_lc9FYbYa5plNhWQ_Etdpw144mtw5wrZqQGdW_a2skx3Dh8eqnABvGlBu5WzjmhINx5KAskrQnQreAFmJda8rQvE8ilKuZp75LvYmoxFP11AXf3ZdnC990GoCbj8Nm9rM9x4rNhHIJX6kmKSzTukPrwk18N9CDX-m2UCBqozlkfeDbnqk5xyr0-Uc8nlgVldhBFdLgDNPebeQxm1vvZeFfWIecEiVQVGOqt3WEPDuPAq0o2CnaMbQ"
+    "tokenValue": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJtb2JpbGUudGhlcmVjc3BvdC5jb20iLCJleHAiOiIyMDIxLTAxLTIyVDIwOjAyOjE2LjkyMDAxMjgxOFoiLCJpYXQiOiIyMDIxLTAxLTIyVDE3OjAyOjE2LjkyMDAxMDMwNloiLCJqdGkiOiJjMjk1OTFlNC02ZWFiLTQyN2QtYTFkMy02MWU0YzBmNDA5NTIiLCJuYmYiOiIyMDIxLTAxLTIyVDE3OjAyOjE2LjkyMDAxMTYxM1oiLCJyb2xlIjoidXNlciIsInN1YiI6IjE3NDA4NzcyMzIwIiwic3ViaWQiOiI2NjA4ZTY2Zi01MDVhLTQ0ZWYtYjY4ZS1kY2E1MGNmYTg3NDkiLCJzdWJ0eXAiOiJwaG9uZV9udW1iZXIiLCJ0dmVyIjoxfQ.OJK2M2PdJbZVsS0Zeh1_1vTaca0uDTNH2zE3Z4PHBb59UgXbbp3-iOGpeQ-tSVBfeIlMRnlzWA0rdWVQmAo7jJt6cEKH6M78w-V5GLIohY8xg3Z9n3korHpH0YXzZxOn4rwWoikpGFlGV_Q2tjK_9WHr5rveHKMgCXusO2d6nRd-EVl1B4mS437Cx3gqB12lK09mZYR1j7DflUtXZjd0bIFDS1LZaNzlvDoY0ZjpYt9YKKmDh1MWAgBghbu3yQ9onyTtlAzg1paI-0yNk_O8-lPAA0UT3-PP1Og7mQ-KfaVenvZcJOOnPnLWYL6rWxEV5_ruyRLaoMi78tyNQZtUNRsZfY4yAeRoCvQ16UpgVOY7l75gEKpcfMi1lnpNRkGkVvbvYGbh9CGOQalXgjDwqoGZ0e3_ftEwESNs40npHJ-0zRYJLac8yx2Nm5N5jjSSqpcrzLPweBqH4atcjKWqncCpPx1J7W37mKQwoK20I4bXcObu7jodcF2ztxgXb731j220-v-cpJN0ZZpLdlPHLglMC_571vPOsp29S1Eod2Hmyr_fX1afb_00fUddJ0OZGjLjMpa3gfg-l9PNa8ztVsnCuKTYsYhrtLgu99NwvfmTDtp1Fiih4y7WCcsYgFUp7RwbTFLiRYNKOaaaRYFRKpgyvVs-VXI4iaS4MA_TU38"
   }
 }
-
-Copy and paste the following into the GraphQL Playground to make authenticated queries:
-{
-  "X_RECSPOT_SESSION_TOKEN": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJtb2JpbGUudGhlcmVjc3BvdC5jb20iLCJleHAiOiIyMDIxLTAxLTA3VDIwOjQ3OjA2LjEyODk3NTE4OVoiLCJpYXQiOiIyMDIxLTAxLTA3VDIwOjE3OjA2LjEyODk3NTA3WiIsImp0aSI6IjU1MmZkYjE2LWE4NmUtNGI3OC05MzMzLTQzYzk0OTFhMGFjNyIsIm5iZiI6IjIwMjEtMDEtMDdUMjA6MTc6MDYuMTI4OTc1MTM0WiIsInJvbGUiOiJ1c2VyIiwic3ViIjoiNzQwODc3MjMyMCIsInN1YmlkIjoiNzRkYTczNDMtNjEzNC00YTNkLWFkMWYtNjNlOTMwYmEyMWExIiwic3VidHlwIjoicGhvbmVfbnVtYmVyIiwidHZlciI6MX0.jNF84zzCjEX_CnfTkCqYMZVC9R72ijjbJjjjcZiFMh7QXjnjhh_mQSQHKQtA6c4hUVDABLTcJaBdoN5mLqkouEia72xyOjbG-3S_hbTM71MlMzTparu_c6M8_E5C7Hppv5GY1SjyOAk05Npo6uBE23q3QOCbcIGG01DqoOLVL0CPQml3R7TRG7IlVbuy9CEOQ0KrfDq4ExCAtmLNp942bnP6ifmBsu_Ymq6NaXWZDlDN3oNAHvtfLCgQvYqL7Xoc1L5ln3WPcV8m76BPuK65bGQhdSWlOd_xUrQQ2eOxC35OGq8G2z-cWl9bZFdA0rIAOpF4eKIbi_IVZBuRG7sylLvkb4r5Kw_DpHVWoVQ47Nce2h8nyik1ye-NiG3i5smnZG3LQ-HAy0QGt62oFiZmRVSnN3G2-ayQi26tuB9V_3j0GhA5ugZuuu_lc9FYbYa5plNhWQ_Etdpw144mtw5wrZqQGdW_a2skx3Dh8eqnABvGlBu5WzjmhINx5KAskrQnQreAFmJda8rQvE8ilKuZp75LvYmoxFP11AXf3ZdnC990GoCbj8Nm9rM9x4rNhHIJX6kmKSzTukPrwk18N9CDX-m2UCBqozlkfeDbnqk5xyr0-Uc8nlgVldhBFdLgDNPebeQxm1vvZeFfWIecEiVQVGOqt3WEPDuPAq0o2CnaMbQ"
-}
+ 
+Copy and paste the following into the GraphQL Playground to make authenticated queries: 
+Starting authentication proxy on http://0.0.0.0:44239
 ```
 
 # Git Config (Required for all private repos)
