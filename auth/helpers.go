@@ -19,9 +19,9 @@ var (
 )
 
 type AuthHeader struct {
-	HeaderKey string
-	Value     string
-	ExpiresAt time.Time
+	HeaderKey string    `json:"headerKey"`
+	Value     string    `json:"value"`
+	ExpiresAt time.Time `json:"expiresAt"`
 }
 
 func StartPromptedSMSVerification(ctx context.Context, graphqlEndpointURL string) (AuthHeader, error) {

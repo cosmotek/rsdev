@@ -18,9 +18,11 @@ var (
 	red   = ansi.ColorCode("red+h")
 	cyan  = ansi.ColorCode("cyan+h")
 	reset = ansi.ColorCode("reset")
+
+	dropExistingSession bool
+	port                string
 )
 
-var port string
 var Proxy = &cobra.Command{
 	Use:   "proxy [endpoint]",
 	Short: "HTTP Authentication Proxy",
@@ -30,21 +32,40 @@ var Proxy = &cobra.Command{
 		hostEndpoint := args[0]
 		grapqlEndpoint := hostEndpoint + "/query"
 
+		header, err := auth.Retrieve(hostEndpoint)
+		if err != nil && err != auth.ErrSessionNotFound {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		foundSession := err != auth.ErrSessionNotFound
+		ctx, cancel := context.WithCancel(context.Background())
+
+		var headerInfo auth.AuthHeader = header
+		if !foundSession || dropExistingSession {
+			// get a starting token
+			headerInfo, err = auth.StartPromptedSMSVerification(ctx, grapqlEndpoint)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+
+			err = headerInfo.Persist(hostEndpoint)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+		} else {
+			fmt.Println(cyan+"[!] Reusing persisted session...", reset)
+		}
+
 		proxy, err := net.NewHeaderProxy(hostEndpoint)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
 
-		// create a context with cancel in case the user interrupts the process
-		ctx, cancel := context.WithCancel(context.Background())
-
-		// get a starting token
-		headerInfo, err := auth.StartPromptedSMSVerification(ctx, grapqlEndpoint)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+		// store token in proxy
 		proxy.Set(headerInfo.HeaderKey, headerInfo.Value)
 
 		go func() {
@@ -64,6 +85,12 @@ var Proxy = &cobra.Command{
 					}
 
 					proxy.Set(headerInfo.HeaderKey, headerInfo.Value)
+					err = headerInfo.Persist(hostEndpoint)
+					if err != nil {
+						fmt.Println(err)
+						os.Exit(1)
+					}
+
 					fmt.Println(cyan+"Token refreshed...", reset)
 				case <-ctx.Done():
 					break loop
@@ -96,4 +123,5 @@ var Proxy = &cobra.Command{
 
 func init() {
 	Proxy.Flags().StringVarP(&port, "port", "p", "", "sets the proxy listener port")
+	Proxy.Flags().BoolVarP(&dropExistingSession, "drop-existing-session", "d", false, "skips reactivation of existing sessions (forcing new login)")
 }
