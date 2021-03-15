@@ -15,7 +15,9 @@ var Login = &cobra.Command{
 	Long:  `Service Login Helper`,
 	Args:  cobra.ExactValidArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		grapqlEndpoint := args[0]
+		hostEndpoint := args[0]
+		grapqlEndpoint := hostEndpoint + "/query"
+
 		ctx := context.Background()
 
 		_, err := auth.StartPromptedSMSVerification(ctx, grapqlEndpoint)
